@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import cors from 'cors'; // Import the cors package
 import userRoutes from './routes/user.route.js';
 import authRoutes from './routes/auth.route.js';
 import postRoutes from './routes/post.route.js';
@@ -22,6 +23,15 @@ mongoose
 const __dirname = path.resolve();
 
 const app = express();
+
+// CORS configuration
+const corsOptions = {
+  origin: 'https://sample-m5up.vercel.app', // Replace with your frontend domain
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions)); // Use the cors middleware
 
 app.use(express.json());
 app.use(cookieParser());
