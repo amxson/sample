@@ -9,7 +9,8 @@ import DashboardComp from '../components/DashboardComp';
 
 export default function Dashboard() {
   const location = useLocation();
-  const [tab, setTab] = useState('');
+  const [tab, setTab] = useState('posts'); // Default to 'posts' tab
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const tabFromUrl = urlParams.get('tab');
@@ -17,21 +18,18 @@ export default function Dashboard() {
       setTab(tabFromUrl);
     }
   }, [location.search]);
+
   return (
     <div className='min-h-screen flex flex-col md:flex-row'>
       <div className='md:w-56'>
         {/* Sidebar */}
         <DashSidebar />
       </div>
-      {/* profile... */}
+      {/* Render the corresponding component based on the tab */}
       {tab === 'profile' && <DashProfile />}
-      {/* posts... */}
       {tab === 'posts' && <DashPosts />}
-      {/* users */}
       {tab === 'users' && <DashUsers />}
-      {/* comments  */}
       {tab === 'comments' && <DashComments />}
-      {/* dashboard comp */}
       {tab === 'dash' && <DashboardComp />}
     </div>
   );
