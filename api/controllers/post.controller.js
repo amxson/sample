@@ -103,3 +103,26 @@ export const updatepost = async (req, res, next) => {
     next(error);
   }
 };
+
+export const likePost = async (req, res, next) => {
+  try {
+    const post = await Post.findById(req.params.postId);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    const userId = req.user.id;
+
+    const userIndex = post.likes.indexOf(userId);
+    if (userIndex === -1) {
+      post.numberOfLikes += 1;
+      post.likes.push(userId);
+    } else {
+      post.numberOfLikes -= 1;
+      post.likes.splice(userIndex, 1);
+    }
+    await post.save();
+    res.status(200).json(post);
+  } catch (error) {
+    next(error);
+  }
+};

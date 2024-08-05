@@ -3,14 +3,18 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import CommentSection from '../components/CommentSection';
 import PostCard from '../components/PostCard';
+import { useSelector } from 'react-redux';
 
 export default function PostPage() {
   const { postSlug } = useParams();
+  const currentUser = useSelector((state) => state.user); // Adjust this according to your setup
   const [user, setUser] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [post, setPost] = useState(null);
+  const [liked, setLiked] = useState(false);
   const [recentPosts, setRecentPosts] = useState(null);
+  const [following, setFollowing] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -44,6 +48,9 @@ export default function PostPage() {
           const data = await res.json();
           if (res.ok) {
             setUser(data);
+            if (currentUser) {
+              setFollowing(data.followers.includes(currentUser._id));
+            }
           }
         } catch (error) {
           console.log(error.message);
@@ -51,7 +58,7 @@ export default function PostPage() {
       };
       getUser();
     }
-  }, [post]);
+  }, [post, currentUser]);
 
   useEffect(() => {
     const fetchRecentPosts = async () => {
@@ -67,6 +74,57 @@ export default function PostPage() {
     };
     fetchRecentPosts();
   }, []);
+
+  useEffect(() => {
+    if (post && currentUser) {
+      setLiked(post.likes.includes(currentUser._id));
+    }
+  }, [post, currentUser]);
+
+  const handleLike = async () => {
+    try {
+      const res = await fetch(`/api/post/likePost/${post._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser._id }),
+      });
+      const updatedPost = await res.json();
+      setPost(updatedPost);
+      setLiked(!liked);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handleFollow = async () => {
+    try {
+      const res = await fetch(`/api/user/follow/${user._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Ensure cookies are sent if using session-based authentication
+      });
+      if (res.ok) {
+        setFollowing(true);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handleUnfollow = async () => {
+    try {
+      const res = await fetch(`/api/user/unfollow/${user._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Ensure cookies are sent if using session-based authentication
+      });
+      if (res.ok) {
+        setFollowing(false);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   if (loading)
     return (
@@ -88,9 +146,20 @@ export default function PostPage() {
         {post && post.title}
       </h1>
       {user && (
-        <p className='text-center'>
-          Author: <strong>{user.username}</strong>
-        </p>
+        <div className='flex items-center justify-center mt-5'>
+          <p className='text-center'>
+            Author: <strong>{user.username}</strong>
+          </p>
+          {currentUser && user._id !== currentUser._id && (
+            <Button
+              color={following ? 'gray' : 'blue'}
+              className='ml-4'
+              onClick={following ? handleUnfollow : handleFollow}
+            >
+              {following ? 'Unfollow' : 'Follow'}
+            </Button>
+          )}
+        </div>
       )}
       <Link
         to={`/search?category=${post && post.category}`}
@@ -115,13 +184,21 @@ export default function PostPage() {
         className='p-3 max-w-2xl mx-auto w-full post-content'
         dangerouslySetInnerHTML={{ __html: post && post.content }}
       ></div>
-      <CommentSection postId={post._id} />
+      <div className='flex items-center'>
+        <button onClick={handleLike} className='mr-2'>
+          {liked ? 'Unlike' : 'Like'}
+        </button>
+        <span>{post && post.numberOfLikes} likes</span>
+      </div>
+      <CommentSection postId={post && post._id} />
 
       <div className='flex flex-col justify-center items-center mb-5'>
         <h1 className='text-xl mt-5'>Recent articles</h1>
         <div className='flex flex-wrap gap-5 mt-5 justify-center'>
           {recentPosts &&
-            recentPosts.map((post) => <PostCard key={post._id} post={post} />)}
+            recentPosts.map((recentPost) => (
+              <PostCard key={recentPost._id} post={recentPost} />
+            ))}
         </div>
       </div>
     </main>

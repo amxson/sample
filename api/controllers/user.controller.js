@@ -131,3 +131,57 @@ export const getUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const followUser = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const currentUserId = req.user.id;
+
+    // Check if the user is already following
+    const userToFollow = await User.findById(userId);
+    if (!userToFollow) return next(errorHandler(404, 'User to follow not found'));
+
+    if (userToFollow.followers.includes(currentUserId)) {
+      return res.status(400).json({ message: 'Already following this user' });
+    }
+
+    await User.findByIdAndUpdate(userId, {
+      $push: { followers: currentUserId },
+    });
+
+    await User.findByIdAndUpdate(currentUserId, {
+      $push: { following: userId },
+    });
+
+    res.status(200).json({ message: 'Followed successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const unfollowUser = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const currentUserId = req.user.id;
+
+    // Check if the user is already following
+    const userToUnfollow = await User.findById(userId);
+    if (!userToUnfollow) return next(errorHandler(404, 'User to unfollow not found'));
+
+    if (!userToUnfollow.followers.includes(currentUserId)) {
+      return res.status(400).json({ message: 'Not following this user' });
+    }
+
+    await User.findByIdAndUpdate(userId, {
+      $pull: { followers: currentUserId },
+    });
+
+    await User.findByIdAndUpdate(currentUserId, {
+      $pull: { following: userId },
+    });
+
+    res.status(200).json({ message: 'Unfollowed successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
