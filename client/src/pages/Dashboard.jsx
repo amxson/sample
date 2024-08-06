@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import DashSidebar from '../components/DashSidebar';
 import DashProfile from '../components/DashProfile';
 import DashPosts from '../components/DashPosts';
+import DashNotification from '../components/DashNotification';
 import DashUsers from '../components/DashUsers';
 import DashComments from '../components/DashComments';
 import DashFollowers from '../components/DashFollowers';
@@ -28,7 +29,9 @@ export default function Dashboard() {
         <DashSidebar />
       </div>
       {/* Render the corresponding component based on the tab */}
+      
       {tab === 'profile' && <DashProfile />}
+      {tab === 'notifications' && <DashNotification />}
       {tab === 'posts' && <DashPosts />}
       {tab === 'users' && <DashUsers />}
       {tab === 'comments' && <DashComments />}

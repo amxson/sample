@@ -131,10 +131,12 @@ export const likePost = async (req, res, next) => {
         const notification = new Notification({
           userId: post.userId,
           postId: post._id,
+          actionUserId: userId,
           type: 'like',
         });
         await notification.save();
       }
+      
     } else {
       post.numberOfLikes -= 1;
       post.likes.splice(userIndex, 1);

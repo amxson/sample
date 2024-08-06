@@ -7,7 +7,7 @@ import SignUp from './pages/SignUp';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import PrivateRoute from './components/PrivateRoute';
-import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute';
+import UserProfile from './components/UserProfile';
 import CreatePost from './pages/CreatePost';
 import UpdatePost from './pages/UpdatePost';
 import PostPage from './pages/PostPage';
@@ -32,6 +32,7 @@ export default function App() {
           <Route path='/update-post/:postId' element={<UpdatePost />} />
 
         <Route path='/post/:postSlug' element={<PostPage />} />
+        <Route path="/user/:id" element={<UserProfile />} />
       </Routes>
       <Footer />
     </BrowserRouter>

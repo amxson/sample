@@ -110,6 +110,15 @@ export default function DashSidebar() {
               Followers
             </Sidebar.Item>
           </Link>
+          <Link to='/dashboard?tab=notifications'>
+            <Sidebar.Item
+              active={tab === 'notifications'}
+              icon={HiAnnotation}
+              as='div'
+            >
+              Notifications
+            </Sidebar.Item>
+          </Link>
           <Link to='/dashboard?tab=following'>
             <Sidebar.Item
               active={tab === 'following'}

@@ -1,6 +1,7 @@
 import bcryptjs from 'bcryptjs';
 import { errorHandler } from '../utils/error.js';
 import User from '../models/user.model.js';
+import Notification from '../models/notification.model.js';
 
 export const test = (req, res) => {
   res.json({ message: 'API is working!' });
@@ -134,20 +135,23 @@ export const getUser = async (req, res, next) => {
 
 export const followUser = async (req, res, next) => {
   try {
-    const { userId } = req.params;
-    const currentUserId = req.user.id;
+    const { userId } = req.params; // The user to be followed
+    const currentUserId = req.user.id; // The currently logged-in user
 
     if (userId === currentUserId) {
       return res.status(400).json({ message: 'You cannot follow yourself' });
     }
 
+    // Find the user to follow
     const userToFollow = await User.findById(userId);
     if (!userToFollow) return next(errorHandler(404, 'User to follow not found'));
 
+    // Check if the current user is already following the user
     if (userToFollow.followers.includes(currentUserId)) {
       return res.status(400).json({ message: 'Already following this user' });
     }
 
+    // Update the followers and following arrays
     await User.findByIdAndUpdate(userId, {
       $push: { followers: currentUserId },
     });
@@ -155,6 +159,15 @@ export const followUser = async (req, res, next) => {
     await User.findByIdAndUpdate(currentUserId, {
       $push: { following: userId },
     });
+
+    // Create a follow notification
+    const notification = new Notification({
+      userId: userId,
+      actionUserId: currentUserId,
+      type: 'follow',
+    });
+
+    await notification.save(); // Save the notification
 
     res.status(200).json({ message: 'Followed successfully' });
   } catch (error) {

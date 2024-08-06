@@ -24,6 +24,7 @@ export const createComment = async (req, res, next) => {
         userId: post.userId,
         postId,
         commentId: newComment._id,
+        actionUserId: userId,
         type: 'comment',
       });
       await notification.save();
