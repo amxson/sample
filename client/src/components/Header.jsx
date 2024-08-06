@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { toggleTheme } from '../redux/theme/themeSlice';
 import { signoutSuccess } from '../redux/user/userSlice';
 import { useEffect, useState } from 'react';
+import Notification from './Notification';
 
 export default function Header() {
   const path = useLocation().pathname;
@@ -55,9 +56,9 @@ export default function Header() {
         className='self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white'
       >
         <span className='px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white'>
-          Sahand's
+          Blog 
         </span>
-        Blog
+        Blast
       </Link>
       <form onSubmit={handleSubmit}>
         <TextInput
@@ -117,6 +118,9 @@ export default function Header() {
         <Navbar.Link active={path === '/about'} as={'div'}>
           <Link to='/about'>About</Link>
         </Navbar.Link>
+        <Navbar.Link as={'div'}>
+         <Notification />
+        </Navbar.Link>
         <Navbar.Link active={path === '/create-post'} as={'div'}>
         <Link to={'/create-post'}>
             <div
@@ -127,6 +131,8 @@ export default function Header() {
               Create a post
             </div>
           </Link>
+        </Navbar.Link>
+        <Navbar.Link active={path === '/create-post'} as={'div'}>
         </Navbar.Link>
       </Navbar.Collapse>
     </Navbar>

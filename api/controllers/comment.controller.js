@@ -1,16 +1,13 @@
 import Comment from '../models/comment.model.js';
+import Notification from '../models/notification.model.js';
+import Post from '../models/post.model.js';
 
 export const createComment = async (req, res, next) => {
-
   try {
     const { content, postId, userId } = req.body;
 
     if (userId !== req.user.id) {
-    
-      return next(
-        errorHandler(403, 'You are not allowed to create this comment')
-      );
-   
+      return next(errorHandler(403, 'You are not allowed to create this comment'));
     }
 
     const newComment = new Comment({
@@ -20,8 +17,19 @@ export const createComment = async (req, res, next) => {
     });
     await newComment.save();
 
-    res.status(200).json(newComment);
+    // Create a notification for the post owner
+    const post = await Post.findById(postId);
+    if (post.userId.toString() !== userId) {
+      const notification = new Notification({
+        userId: post.userId,
+        postId,
+        commentId: newComment._id,
+        type: 'comment',
+      });
+      await notification.save();
+    }
 
+    res.status(200).json(newComment);
   } catch (error) {
     next(error);
   }

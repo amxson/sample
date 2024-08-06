@@ -1,5 +1,7 @@
 import Post from '../models/post.model.js';
 import { errorHandler } from '../utils/error.js';
+import Notification from '../models/notification.model.js';
+
 
 export const create = async (req, res, next) => {
   if (!req.body.title || !req.body.content) {
@@ -118,11 +120,21 @@ export const likePost = async (req, res, next) => {
       return res.status(404).json({ message: 'Post not found' });
     }
     const userId = req.user.id;
-
     const userIndex = post.likes.indexOf(userId);
+
     if (userIndex === -1) {
       post.numberOfLikes += 1;
       post.likes.push(userId);
+
+      // Create a notification for the post owner
+      if (post.userId.toString() !== userId) {
+        const notification = new Notification({
+          userId: post.userId,
+          postId: post._id,
+          type: 'like',
+        });
+        await notification.save();
+      }
     } else {
       post.numberOfLikes -= 1;
       post.likes.splice(userIndex, 1);
