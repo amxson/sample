@@ -1,3 +1,4 @@
+// user.routes.js
 import express from 'express';
 import {
   deleteUser,
@@ -6,8 +7,10 @@ import {
   signout,
   test,
   updateUser,
-  followUser,      // Add this
-  unfollowUser     // Add this
+  followUser,
+  unfollowUser,
+  getUserFollowers,
+  getUserFollowing
 } from '../controllers/user.controller.js';
 import { verifyToken } from '../utils/verifyUser.js';
 
@@ -19,7 +22,9 @@ router.delete('/delete/:userId', verifyToken, deleteUser);
 router.post('/signout', signout);
 router.get('/getusers', verifyToken, getUsers);
 router.get('/:userId', getUser);
-router.put('/follow/:userId', verifyToken, followUser);      // Add this
-router.put('/unfollow/:userId', verifyToken, unfollowUser);  // Add this
+router.get('/:userId/followers', verifyToken, getUserFollowers);
+router.get('/:userId/following', verifyToken, getUserFollowing);
+router.put('/follow/:userId', verifyToken, followUser);    
+router.put('/unfollow/:userId', verifyToken, unfollowUser);
 
 export default router;

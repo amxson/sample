@@ -60,7 +60,7 @@ export default function DashboardComp() {
         console.log(error.message);
       }
     };
-    if (true) {
+    if (currentUser) {
       fetchUsers();
       fetchPosts();
       fetchComments();

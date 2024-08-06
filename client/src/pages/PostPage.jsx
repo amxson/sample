@@ -1,13 +1,14 @@
 import { Button, Spinner } from 'flowbite-react';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import CommentSection from '../components/CommentSection';
 import PostCard from '../components/PostCard';
 import { useSelector } from 'react-redux';
 
 export default function PostPage() {
   const { postSlug } = useParams();
-  const currentUser = useSelector((state) => state.user); // Adjust this according to your setup
+  const navigate = useNavigate();
+  const currentUser = useSelector((state) => state.user.currentUser);
   const [user, setUser] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -21,30 +22,37 @@ export default function PostPage() {
       try {
         setLoading(true);
         const res = await fetch(`/api/post/getposts?slug=${postSlug}`);
+        if (res.status === 401) {
+          navigate('/sign-in');
+          return;
+        }
         const data = await res.json();
         if (!res.ok) {
           setError(true);
           setLoading(false);
           return;
         }
-        if (res.ok) {
-          setPost(data.posts[0]);
-          setLoading(false);
-          setError(false);
-        }
+        console.log(data.posts[0]);
+        setPost(data.posts[0]);
+        setLoading(false);
+        setError(false);
       } catch (error) {
         setError(true);
         setLoading(false);
       }
     };
     fetchPost();
-  }, [postSlug]);
+  }, [postSlug, navigate]);
 
   useEffect(() => {
     if (post && post.userId) {
       const getUser = async () => {
         try {
           const res = await fetch(`/api/user/${post.userId}`);
+          if (res.status === 401) {
+            navigate('/sign-in');
+            return;
+          }
           const data = await res.json();
           if (res.ok) {
             setUser(data);
@@ -58,12 +66,16 @@ export default function PostPage() {
       };
       getUser();
     }
-  }, [post, currentUser]);
+  }, [post, currentUser, navigate]);
 
   useEffect(() => {
     const fetchRecentPosts = async () => {
       try {
         const res = await fetch(`/api/post/getposts?limit=3`);
+        if (res.status === 401) {
+          navigate('/sign-in');
+          return;
+        }
         const data = await res.json();
         if (res.ok) {
           setRecentPosts(data.posts);
@@ -73,7 +85,7 @@ export default function PostPage() {
       }
     };
     fetchRecentPosts();
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     if (post && currentUser) {
@@ -82,12 +94,21 @@ export default function PostPage() {
   }, [post, currentUser]);
 
   const handleLike = async () => {
+    if (!currentUser) {
+      navigate('/sign-in');
+      return;
+    }
+
     try {
       const res = await fetch(`/api/post/likePost/${post._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: currentUser._id }),
       });
+      if (res.status === 401) {
+        navigate('/sign-in');
+        return;
+      }
       const updatedPost = await res.json();
       setPost(updatedPost);
       setLiked(!liked);
@@ -97,14 +118,28 @@ export default function PostPage() {
   };
 
   const handleFollow = async () => {
+    if (!currentUser) {
+      navigate('/sign-in');
+      return;
+    }
+
+    if (following) return;
+
     try {
       const res = await fetch(`/api/user/follow/${user._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Ensure cookies are sent if using session-based authentication
+        credentials: 'include',
       });
+      if (res.status === 401) {
+        navigate('/sign-in');
+        return;
+      }
       if (res.ok) {
         setFollowing(true);
+      } else {
+        const data = await res.json();
+        console.log(data.message);
       }
     } catch (error) {
       console.log(error.message);
@@ -112,14 +147,23 @@ export default function PostPage() {
   };
 
   const handleUnfollow = async () => {
+    if (!currentUser || !following) return;
+
     try {
       const res = await fetch(`/api/user/unfollow/${user._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Ensure cookies are sent if using session-based authentication
+        credentials: 'include',
       });
+      if (res.status === 401) {
+        navigate('/sign-in');
+        return;
+      }
       if (res.ok) {
         setFollowing(false);
+      } else {
+        const data = await res.json();
+        console.log(data.message);
       }
     } catch (error) {
       console.log(error.message);
@@ -174,6 +218,20 @@ export default function PostPage() {
         alt={post && post.title}
         className='mt-10 p-3 max-h-[600px] w-full object-cover'
       />
+    <div className='flex flex-wrap gap-2 mt-4'>
+  {post && post.tags && post.tags.length > 0 ? (
+    post.tags.map((tag, index) => (
+      <Link key={index} to={`/search?tag=${tag}`}>
+        <Button color='gray' pill size='xs'>
+          #{tag}
+        </Button>
+      </Link>
+    ))
+  ) : (
+    <p>No tags available</p>
+  )}
+</div>
+
       <div className='flex justify-between p-3 border-b border-slate-500 mx-auto w-full max-w-2xl text-xs'>
         <span>{post && new Date(post.createdAt).toLocaleDateString()}</span>
         <span className='italic'>

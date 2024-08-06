@@ -137,7 +137,10 @@ export const followUser = async (req, res, next) => {
     const { userId } = req.params;
     const currentUserId = req.user.id;
 
-    // Check if the user is already following
+    if (userId === currentUserId) {
+      return res.status(400).json({ message: 'You cannot follow yourself' });
+    }
+
     const userToFollow = await User.findById(userId);
     if (!userToFollow) return next(errorHandler(404, 'User to follow not found'));
 
@@ -158,6 +161,7 @@ export const followUser = async (req, res, next) => {
     next(error);
   }
 };
+
 
 export const unfollowUser = async (req, res, next) => {
   try {
@@ -183,5 +187,35 @@ export const unfollowUser = async (req, res, next) => {
     res.status(200).json({ message: 'Unfollowed successfully' });
   } catch (error) {
     next(error);
+  }
+};
+
+export const getUserFollowers = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId)
+      .populate('followers', 'username _id') // Populate followers field
+      .exec();
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user.followers); // Return only the followers
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const getUserFollowing = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId)
+      .populate('following', 'username _id') // Populate following field
+      .exec();
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user.following); // Return only the following
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
   }
 };

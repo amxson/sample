@@ -6,6 +6,7 @@ import {
   HiOutlineUserGroup,
   HiAnnotation,
   HiChartPie,
+  HiUsers, // Icon for Followers tab
 } from 'react-icons/hi';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -18,6 +19,7 @@ export default function DashSidebar() {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
   const [tab, setTab] = useState('');
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const tabFromUrl = urlParams.get('tab');
@@ -25,6 +27,7 @@ export default function DashSidebar() {
       setTab(tabFromUrl);
     }
   }, [location.search]);
+
   const handleSignout = async () => {
     try {
       const res = await fetch('/api/user/signout', {
@@ -40,6 +43,7 @@ export default function DashSidebar() {
       console.log(error.message);
     }
   };
+
   return (
     <Sidebar className='w-full md:w-56'>
       <Sidebar.Items>
@@ -66,16 +70,15 @@ export default function DashSidebar() {
               Profile
             </Sidebar.Item>
           </Link>
-    
-            <Link to='/dashboard?tab=posts'>
-              <Sidebar.Item
-                active={tab === 'posts'}
-                icon={HiDocumentText}
-                as='div'
-              >
-                Posts
-              </Sidebar.Item>
-            </Link>
+          <Link to='/dashboard?tab=posts'>
+            <Sidebar.Item
+              active={tab === 'posts'}
+              icon={HiDocumentText}
+              as='div'
+            >
+              Posts
+            </Sidebar.Item>
+          </Link>
           {currentUser.isAdmin && (
             <>
               <Link to='/dashboard?tab=users'>
@@ -98,6 +101,24 @@ export default function DashSidebar() {
               </Link>
             </>
           )}
+          <Link to='/dashboard?tab=followers'>
+            <Sidebar.Item
+              active={tab === 'followers'}
+              icon={HiUser}
+              as='div'
+            >
+              Followers
+            </Sidebar.Item>
+          </Link>
+          <Link to='/dashboard?tab=following'>
+            <Sidebar.Item
+              active={tab === 'following'}
+              icon={HiUser}
+              as='div'
+            >
+              Following
+            </Sidebar.Item>
+          </Link>
           <Sidebar.Item
             icon={HiArrowSmRight}
             className='cursor-pointer'
