@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const Notification = () => {
+  const navigate = useNavigate();
   const [unreadCount, setUnreadCount] = useState(0);
   const { currentUser } = useSelector((state) => state.user);
 
@@ -23,11 +25,16 @@ const Notification = () => {
     fetchNotificationCounts();
   }, [currentUser]);
 
+  const handleBellClick = async () => {
+    navigate('/dashboard?tab=notifications');
+  }
+
   return (
     <header className="header">
       <div className="header-content">
         {/* Other header content */}
-        <div className="notification-icon">
+
+        <div className="notification-icon"  onClick={handleBellClick}>
           <span className={`icon ${unreadCount > 0 ? 'glowing-red' : ''}`}>🔔</span>
           {unreadCount > 0 && (
             <div className="notification-counter">
