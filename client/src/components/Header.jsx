@@ -60,20 +60,18 @@ export default function Header() {
         </span>
         Blast
       </Link>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className='order-2 pt-1 pl-20'>
         <TextInput
           type='text'
           placeholder='Search...'
           rightIcon={AiOutlineSearch}
-          className='hidden lg:inline'
+          className='lg:inline'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </form>
-      <Button className='w-12 h-10 lg:hidden' color='gray' pill>
-        <AiOutlineSearch />
-      </Button>
       <div className='flex gap-2 md:order-2'>
+      <Notification />
         <Button
           className='w-12 h-10 hidden sm:inline'
           color='gray'
@@ -82,6 +80,7 @@ export default function Header() {
         >
           {theme === 'light' ? <FaSun /> : <FaMoon />}
         </Button>
+       
         {currentUser ? (
           <Dropdown
             arrowIcon={false}
@@ -90,15 +89,19 @@ export default function Header() {
               <Avatar alt='user' img={currentUser.profilePicture} rounded />
             }
           >
+                
             <Dropdown.Header>
               <span className='block text-sm'>@{currentUser.username}</span>
               <span className='block text-sm font-medium truncate'>
                 {currentUser.email}
               </span>
+          
             </Dropdown.Header>
             <Link to={'/dashboard?tab=profile'}>
               <Dropdown.Item>Profile</Dropdown.Item>
             </Link>
+
+       
             <Dropdown.Divider />
             <Dropdown.Item onClick={handleSignout}>Sign out</Dropdown.Item>
           </Dropdown>
@@ -111,15 +114,13 @@ export default function Header() {
         )}
         <Navbar.Toggle />
       </div>
+      
       <Navbar.Collapse>
         <Navbar.Link active={path === '/'} as={'div'}>
           <Link to='/'>Home</Link>
         </Navbar.Link>
         <Navbar.Link active={path === '/about'} as={'div'}>
           <Link to='/about'>About</Link>
-        </Navbar.Link>
-        <Navbar.Link as={'div'}>
-         <Notification />
         </Navbar.Link>
         <Navbar.Link active={path === '/create-post'} as={'div'}>
         <Link to={'/create-post'}>
@@ -135,6 +136,7 @@ export default function Header() {
         <Navbar.Link active={path === '/create-post'} as={'div'}>
         </Navbar.Link>
       </Navbar.Collapse>
+      
     </Navbar>
   );
 }
