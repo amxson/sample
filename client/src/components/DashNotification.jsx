@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { Table, Button } from 'flowbite-react';
+import axios from 'axios';
 
 const DashNotification = () => {
   const [notifications, setNotifications] = useState([]);
@@ -28,8 +30,38 @@ const DashNotification = () => {
     }
   }, [currentUser]);
 
+  const markNotificationsAsRead = async () => {
+    try {
+      await axios.post('/api/notifications/mark-as-read', {}, {
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+        },
+      });
+      // Trigger a refetch of notifications after marking as read
+      fetch('/api/notifications/all', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentUser.token}`,
+        },
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            setNotifications(data);
+          } else {
+            console.error('Expected an array but got:', data);
+            setNotifications([]);
+          }
+        })
+        .catch(error => console.error('Error fetching notifications:', error));
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+    }
+  };
+
   return (
-    <div className='table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500'>
+    <div className='table-auto md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500 flex flex-col justify-center overflow-hidden'>
       {notifications.length > 0 ? (
         <Table hoverable className='shadow-md'>
           <Table.Head>
@@ -44,10 +76,12 @@ const DashNotification = () => {
                   {new Date(notification.createdAt).toLocaleDateString()}
                 </Table.Cell>
                 <Table.Cell>
-                {notification.type === 'like' ? 'Like' : notification.type === 'comment' ? 'Comment' : 'Follow'}
+                  {notification.type === 'like' ? 'Like' : notification.type === 'comment' ? 'Comment' : 'Follow'}
                 </Table.Cell>
                 <Table.Cell>
-                  `@{notification.actionUserId?.username || 'Unknown user'}`
+                  <Link to={`/user/${notification.actionUserId._id}`} className='text-blue-500'>
+                    `@{notification.actionUserId?.username || 'Unknown user'}`
+                  </Link>
                   {notification.type === 'like' ? ' liked your post' : notification.type === 'comment' ? ' commented on your post': " started following you"}
                 </Table.Cell>
               </Table.Row>
@@ -57,6 +91,7 @@ const DashNotification = () => {
       ) : (
         <p>No notifications available</p>
       )}
+      <Button className={"mt-10"} onClick={markNotificationsAsRead}>Mark all as read</Button>
     </div>
   );
 };
