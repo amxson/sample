@@ -1,6 +1,7 @@
 import { Footer } from 'flowbite-react';
 import { Link } from 'react-router-dom';
-import { BsFacebook, BsInstagram, BsTwitter, BsGithub, BsDribbble, BsDiscord } from 'react-icons/bs';
+import { BsFacebook, BsInstagram, BsTwitter, BsGithub, BsDiscord } from 'react-icons/bs';
+
 export default function FooterCom() {
   return (
     <Footer container className='border border-t-8 border-teal-500'>
@@ -17,18 +18,37 @@ export default function FooterCom() {
               Blast
             </Link>
           </div>
-          <div className=' gap-8 mt-4 sm:grid-cols-3 sm:gap-6'>
+          <div className='gap-8 mt-4 sm:grid-cols-3 sm:gap-6'>
             <div>
               <Footer.Title title='Follow us' />
               <div className="flex gap-6 sm:mt-0 mt-4 sm:justify-center">
-            <Footer.Icon href='https://facebook.com' icon={BsFacebook}/>
-            <Footer.Icon href='https://instagram.com' icon={BsInstagram}/>
-            <Footer.Icon href='https://twitter.com' icon={BsTwitter}/>
-            <Footer.Icon href='https://github.com' icon={BsGithub}/>
-            <Footer.Icon href='https://discord.com' icon={BsDiscord}/>
-
-          </div>
-          </div>
+                <Footer.Icon 
+                  href='https://facebook.com' 
+                  icon={BsFacebook} 
+                  className='transition-transform transform hover:scale-110 hover:text-teal-500 hover:drop-shadow-lg' 
+                />
+                <Footer.Icon 
+                  href='https://instagram.com' 
+                  icon={BsInstagram} 
+                  className='transition-transform transform hover:scale-110 hover:text-teal-500 hover:drop-shadow-lg' 
+                />
+                <Footer.Icon 
+                  href='https://twitter.com' 
+                  icon={BsTwitter} 
+                  className='transition-transform transform hover:scale-110 hover:text-teal-500 hover:drop-shadow-lg' 
+                />
+                <Footer.Icon 
+                  href='https://github.com' 
+                  icon={BsGithub} 
+                  className='transition-transform transform hover:scale-110 hover:text-teal-500 hover:drop-shadow-lg' 
+                />
+                <Footer.Icon 
+                  href='https://discord.com' 
+                  icon={BsDiscord} 
+                  className='transition-transform transform hover:scale-110 hover:text-teal-500 hover:drop-shadow-lg' 
+                />
+              </div>
+            </div>
           </div>
         </div>
         <Footer.Divider />
@@ -38,7 +58,6 @@ export default function FooterCom() {
             by="Blog  Blast"
             year={new Date().getFullYear()}
           />
-          
         </div>
       </div>
     </Footer>
