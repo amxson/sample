@@ -61,10 +61,6 @@ export default function UserProfile() {
           <p>{user.following?.length || 0}</p>
         </div>
       </div>
-      <div className="mt-4">
-        <h2 className="text-xl mb-2">About</h2>
-        <p>{user.bio || 'No bio available.'}</p>
-      </div>
     </div>
   );
 }
