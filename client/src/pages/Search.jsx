@@ -6,7 +6,6 @@ import PostCard from '../components/PostCard';
 export default function Search() {
   const [sidebarData, setSidebarData] = useState({
     searchTerm: '',
-    sort: 'desc',
     category: 'uncategorized',
     tag: '', // Add tag to sidebarData
   });
@@ -21,15 +20,13 @@ export default function Search() {
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get('searchTerm');
-    const sortFromUrl = urlParams.get('sort');
     const categoryFromUrl = urlParams.get('category');
     const tagFromUrl = urlParams.get('tag'); // Get tag from URL
 
-    if (searchTermFromUrl || sortFromUrl || categoryFromUrl || tagFromUrl) {
+    if (searchTermFromUrl || categoryFromUrl || tagFromUrl) {
       setSidebarData({
         ...sidebarData,
         searchTerm: searchTermFromUrl || sidebarData.searchTerm,
-        sort: sortFromUrl || sidebarData.sort,
         category: categoryFromUrl || sidebarData.category,
         tag: tagFromUrl || sidebarData.tag,
       });
@@ -95,13 +92,6 @@ export default function Search() {
               value={sidebarData.searchTerm}
               onChange={handleChange}
             />
-          </div>
-          <div className='flex items-center gap-2'>
-            <label className='font-semibold'>Sort:</label>
-            <Select onChange={handleChange} value={sidebarData.sort} id='sort'>
-              <option value='desc'>Latest</option>
-              <option value='asc'>Oldest</option>
-            </Select>
           </div>
           <div className='flex items-center gap-2'>
             <label className='font-semibold'>Category:</label>
