@@ -203,12 +203,15 @@ export default function PostPage() {
         <div className='flex items-center justify-center mt-5'>
           <p className='text-center flex items-center'>
             <span className='mr-3'>By:</span>
-            <img
-              src={user.profilePicture || 'default-profile-picture-url'}
-              alt={user.username}
-              className='w-12 h-12 rounded-full object-cover mr-3'
-            />
-            <strong>{user.username}</strong>
+            <Link to={`/user/${user._id}`} className='flex items-center'>
+              <img
+                src={user.profilePicture || 'default-profile-picture-url'}
+                alt={user.username}
+                className='w-12 h-12 rounded-full object-cover mr-3'
+              />
+              <strong>{user.username}</strong>
+            </Link>
+
           </p>
           {currentUser && user._id !== currentUser._id && (
             <Button

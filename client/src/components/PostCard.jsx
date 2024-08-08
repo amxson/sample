@@ -14,14 +14,17 @@ export default function PostCard({ post }) {
         <p className='text-lg font-semibold line-clamp-2'>{post.title}</p>
         <span className='italic text-sm'>{post.category}</span>
         {post.user && (
+        <Link to={`/user/${post.user._id}`} className='flex items-center'>
           <div className='flex items-center mt-2'>
             <img
               src={post.user.profilePicture}
               alt={`${post.user.username}'s profile`}
               className='w-8 h-8 rounded-full'
             />
+           
             <span className='ml-2 text-sm font-medium'>{post.user.username}</span>
           </div>
+          </Link>
         )}
         <Link
           to={`/post/${post.slug}`}
