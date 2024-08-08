@@ -14,7 +14,19 @@ export default function DashFollowers() {
         const res = await fetch(`/api/user/${currentUser._id}/followers`);
         const data = await res.json();
         if (res.ok) {
-          setFollowers(data);
+          const followerDetails = await Promise.all(
+            data.map(async (follower) => {
+              try {
+                const userRes = await fetch(`/api/user/${follower._id}`);
+                const userData = await userRes.json();
+                return { ...follower, profilePicture: userData.profilePicture };
+              } catch (error) {
+                console.log(`Error fetching details for follower ${follower._id}:`, error.message);
+                return { ...follower, profilePicture: 'default-profile-picture-url' }; // Fallback
+              }
+            })
+          );
+          setFollowers(followerDetails);
         }
         setLoading(false);
       } catch (error) {
@@ -31,7 +43,7 @@ export default function DashFollowers() {
   }
 
   return (
-    <div className="p-4 flex-grow flex flex-col" style={{margin: "1em auto"}}>
+    <div className="p-4 flex-grow flex flex-col" style={{ margin: "1em auto" }}>
       <div className='text-center mb-6'>
         <h2 className='text-3xl font-bold text-gray-700 dark:text-gray-300'>
           Followers
@@ -47,9 +59,9 @@ export default function DashFollowers() {
             <Table.HeadCell>Profile Image</Table.HeadCell>
             <Table.HeadCell>Username</Table.HeadCell>
           </Table.Head>
-          {followers.map((follower) => (
-            <Table.Body className='divide-y' key={follower._id}>
-              <Table.Row className='bg-white dark:border-gray-700 dark:bg-gray-800'>
+          <Table.Body className='divide-y'>
+            {followers.map((follower) => (
+              <Table.Row className='bg-white dark:border-gray-700 dark:bg-gray-800' key={follower._id}>
                 <Table.Cell>
                   <Link to={`/user/${follower._id}`} className='text-blue-500'>
                     {follower.username}
@@ -64,8 +76,8 @@ export default function DashFollowers() {
                 </Table.Cell>
                 <Table.Cell>{follower.username}</Table.Cell>
               </Table.Row>
-            </Table.Body>
-          ))}
+            ))}
+          </Table.Body>
         </Table>
       </div>
     </div>

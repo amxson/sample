@@ -11,10 +11,26 @@ export default function DashFollowing() {
   useEffect(() => {
     const fetchFollowing = async () => {
       try {
+        // Fetch the list of users being followed
         const res = await fetch(`/api/user/${currentUser._id}/following`);
         const data = await res.json();
+
         if (res.ok) {
-          setFollowing(data);
+          // Fetch detailed information for each followed user
+          const followingDetails = await Promise.all(
+            data.map(async (followed) => {
+              try {
+                // Fetch each followed user's detailed information
+                const userRes = await fetch(`/api/user/${followed._id}`);
+                const userData = await userRes.json();
+                return { ...followed, profilePicture: userData.profilePicture };
+              } catch (error) {
+                console.log(`Error fetching details for followed user ${followed._id}:`, error.message);
+                return { ...followed, profilePicture: 'default-profile-picture-url' }; // Fallback
+              }
+            })
+          );
+          setFollowing(followingDetails);
         }
         setLoading(false);
       } catch (error) {
@@ -47,9 +63,9 @@ export default function DashFollowing() {
             <Table.HeadCell>Profile Image</Table.HeadCell>
             <Table.HeadCell>Username</Table.HeadCell>
           </Table.Head>
-          {following.map((followed) => (
-            <Table.Body className='divide-y' key={followed._id}>
-              <Table.Row className='bg-white dark:border-gray-700 dark:bg-gray-800'>
+          <Table.Body className='divide-y'>
+            {following.map((followed) => (
+              <Table.Row className='bg-white dark:border-gray-700 dark:bg-gray-800' key={followed._id}>
                 <Table.Cell>
                   <Link to={`/user/${followed._id}`} className='text-blue-500'>
                     {followed.username}
@@ -64,8 +80,8 @@ export default function DashFollowing() {
                 </Table.Cell>
                 <Table.Cell>{followed.username}</Table.Cell>
               </Table.Row>
-            </Table.Body>
-          ))}
+            ))}
+          </Table.Body>
         </Table>
       </div>
     </div>
