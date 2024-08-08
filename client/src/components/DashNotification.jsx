@@ -32,11 +32,13 @@ const DashNotification = () => {
 
   const markNotificationsAsRead = async () => {
     try {
+      // Mark notifications as read
       await axios.post('/api/notifications/mark-as-read', {}, {
         headers: {
           'Authorization': `Bearer ${currentUser.token}`,
         },
       });
+  
       // Trigger a refetch of notifications after marking as read
       fetch('/api/notifications/all', {
         method: 'GET',
@@ -45,20 +47,24 @@ const DashNotification = () => {
           'Authorization': `Bearer ${currentUser.token}`,
         },
       })
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            setNotifications(data);
-          } else {
-            console.error('Expected an array but got:', data);
-            setNotifications([]);
-          }
-        })
-        .catch(error => console.error('Error fetching notifications:', error));
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setNotifications(data);
+        } else {
+          console.error('Expected an array but got:', data);
+          setNotifications([]);
+        }
+      })
+      .catch(error => console.error('Error fetching notifications:', error));
+      
+      // Reload the page
+      window.location.reload();
     } catch (error) {
       console.error('Error marking notifications as read:', error);
     }
   };
+  
 
   return (
     <div className='table-auto md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500 flex flex-col justify-center overflow-hidden'>

@@ -36,8 +36,7 @@ export const getNotificationCounts = async (req, res, next) => {
         .populate('commentId') // Optionally, populate the comment details if needed
         .sort({ createdAt: -1 });
   
-      console.log('Notifications:', notifications); // Log notifications for debugging
-  
+     
       res.status(200).json(notifications);
     } catch (error) {
       next(error);
@@ -53,6 +52,7 @@ export const markNotificationsAsRead = async (req, res, next) => {
       { userId: req.user.id, read: false },
       { $set: { read: true } }
     );
+    
 
     // Delete all notifications for the user
     await Notification.deleteMany({ userId: req.user.id });
