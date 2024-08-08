@@ -31,7 +31,7 @@ export default function DashFollowers() {
   }
 
   return (
-    <div className='p-4'>
+    <div className="p-4 flex-grow flex flex-col" style={{margin: "1em auto"}}>
       <div className='text-center mb-6'>
         <h2 className='text-3xl font-bold text-gray-700 dark:text-gray-300'>
           Followers

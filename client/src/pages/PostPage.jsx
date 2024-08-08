@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import CommentSection from '../components/CommentSection';
 import PostCard from '../components/PostCard';
+import { FaHeart } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 
 export default function PostPage() {
@@ -32,7 +33,6 @@ export default function PostPage() {
           setLoading(false);
           return;
         }
-        console.log(data.posts[0]);
         setPost(data.posts[0]);
         setLoading(false);
         setError(false);
@@ -189,10 +189,18 @@ export default function PostPage() {
       <h1 className='text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl'>
         {post && post.title}
       </h1>
+      
+      {/* Author Information */}
       {user && (
         <div className='flex items-center justify-center mt-5'>
-          <p className='text-center'>
-            Author: <strong>{user.username}</strong>
+          <p className='text-center flex items-center'>
+            <span className='mr-3'>By:</span>
+            <img
+              src={user.profilePicture || 'default-profile-picture-url'}
+              alt={user.username}
+              className='w-12 h-12 rounded-full object-cover mr-3'
+            />
+            <strong>{user.username}</strong>
           </p>
           {currentUser && user._id !== currentUser._id && (
             <Button
@@ -205,6 +213,22 @@ export default function PostPage() {
           )}
         </div>
       )}
+
+      {/* Tags Section */}
+      <div className='flex flex-wrap gap-2 mt-4 justify-center'>
+        {post && post.tags && post.tags.length > 0 ? (
+          post.tags.map((tag, index) => (
+            <Link key={index} to={`/search?tag=${tag}`}>
+              <Button color='gray' pill size='xs'>
+                #{tag}
+              </Button>
+            </Link>
+          ))
+        ) : (
+          <p>No tags available</p>
+        )}
+      </div>
+
       <Link
         to={`/search?category=${post && post.category}`}
         className='self-center mt-5'
@@ -213,24 +237,12 @@ export default function PostPage() {
           {post && post.category}
         </Button>
       </Link>
+
       <img
         src={post && post.image}
         alt={post && post.title}
-        className='mt-10 p-3 max-h-[600px] w-full object-cover'
+        className='mt-10 p-3 max-w-2xl mx-auto w-full object-cover'
       />
-    <div className='flex flex-wrap gap-2 mt-4'>
-  {post && post.tags && post.tags.length > 0 ? (
-    post.tags.map((tag, index) => (
-      <Link key={index} to={`/search?tag=${tag}`}>
-        <Button color='gray' pill size='xs'>
-          #{tag}
-        </Button>
-      </Link>
-    ))
-  ) : (
-    <p>No tags available</p>
-  )}
-</div>
 
       <div className='flex justify-between p-3 border-b border-slate-500 mx-auto w-full max-w-2xl text-xs'>
         <span>{post && new Date(post.createdAt).toLocaleDateString()}</span>
@@ -238,16 +250,27 @@ export default function PostPage() {
           {post && (post.content.length / 1000).toFixed(0)} mins read
         </span>
       </div>
+
       <div
         className='p-3 max-w-2xl mx-auto w-full post-content'
         dangerouslySetInnerHTML={{ __html: post && post.content }}
       ></div>
-      <div className='flex items-center'>
-        <button onClick={handleLike} className='mr-2'>
-          {liked ? 'Unlike' : 'Like'}
-        </button>
-        <span>{post && post.numberOfLikes} likes</span>
-      </div>
+
+<div className='flex items-center p-3 border-b border-slate-500 max-w-2xl mx-auto'>
+  <button
+    onClick={handleLike}
+    className='mr-2 p-2'
+  >
+    <FaHeart
+      className={`w-6 h-6 ${liked ? 'text-red-500' : 'text-gray-500'}`}
+    />
+  </button>
+  <span>{post && post.numberOfLikes} likes</span>
+</div>
+
+
+
+
       <CommentSection postId={post && post._id} />
 
       <div className='flex flex-col justify-center items-center mb-5'>
