@@ -15,7 +15,7 @@ export default function PostPage() {
   const [error, setError] = useState(false);
   const [post, setPost] = useState(null);
   const [liked, setLiked] = useState(false);
-  const [recentPosts, setRecentPosts] = useState(null);
+  const [recentPosts, setRecentPosts] = useState([]);
   const [following, setFollowing] = useState(false);
 
   useEffect(() => {
@@ -78,7 +78,15 @@ export default function PostPage() {
         }
         const data = await res.json();
         if (res.ok) {
-          setRecentPosts(data.posts);
+          // Fetch user information for each recent post
+          const recentPostsWithUser = await Promise.all(
+            data.posts.map(async (recentPost) => {
+              const userRes = await fetch(`/api/user/${recentPost.userId}`);
+              const userData = await userRes.json();
+              return { ...recentPost, user: userData };
+            })
+          );
+          setRecentPosts(recentPostsWithUser);
         }
       } catch (error) {
         console.log(error.message);
@@ -254,7 +262,6 @@ export default function PostPage() {
         className='p-3 max-w-2xl mx-auto w-full post-content'
         dangerouslySetInnerHTML={{ __html: post && post.content }}>
 
-          
         </div>
  
         <div className='flex items-center  w-full post-content p-3 max-w-2xl mx-auto'>
@@ -279,7 +286,11 @@ export default function PostPage() {
         <div className='flex flex-wrap gap-5 mt-5 justify-center'>
           {recentPosts &&
             recentPosts.map((recentPost) => (
-              <PostCard key={recentPost._id} post={recentPost} />
+              <PostCard
+                key={recentPost._id}
+                post={recentPost}
+                user={recentPost.user}
+              />
             ))}
         </div>
       </div>
