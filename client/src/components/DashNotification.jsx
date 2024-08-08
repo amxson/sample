@@ -90,7 +90,7 @@ const DashNotification = () => {
                   <Link to={`/user/${notification.actionUserId._id}`} className='text-blue-500'>
                     `@{notification.actionUserId?.username || 'Unknown user'}`
                   </Link>
-                  {notification.type === 'post' ? `User ${notification.actionUserId.username} posted new content`: notification.type === 'like' ? ' liked your post' : notification.type === 'comment' ? ' commented on your post': " started following you"}
+                  {notification.type === 'post' ? `posted new content`: notification.type === 'like' ? ' liked your post' : notification.type === 'comment' ? ' commented on your post': " started following you"}
                 </Table.Cell>
               </Table.Row>
             ))}
