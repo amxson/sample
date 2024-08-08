@@ -250,13 +250,14 @@ export default function PostPage() {
           {post && (post.content.length / 1000).toFixed(0)} mins read
         </span>
       </div>
-
       <div
         className='p-3 max-w-2xl mx-auto w-full post-content'
-        dangerouslySetInnerHTML={{ __html: post && post.content }}
-      ></div>
+        dangerouslySetInnerHTML={{ __html: post && post.content }}>
 
-<div className='flex items-center p-3 border-b border-slate-500 max-w-2xl mx-auto'>
+          
+        </div>
+ 
+        <div className='flex items-center  w-full post-content p-3 max-w-2xl mx-auto'>
   <button
     onClick={handleLike}
     className='mr-2 p-2'
