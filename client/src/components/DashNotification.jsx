@@ -82,13 +82,15 @@ const DashNotification = () => {
                   {new Date(notification.createdAt).toLocaleDateString()}
                 </Table.Cell>
                 <Table.Cell>
-                  {notification.type === 'like' ? 'Like' : notification.type === 'comment' ? 'Comment' : 'Follow'}
+                
+                
+                  {notification.type === 'like' ? 'Like' : notification.type === 'comment' ? 'Comment' : notification.type === 'post'? 'Post' : 'Follow'}
                 </Table.Cell>
                 <Table.Cell>
                   <Link to={`/user/${notification.actionUserId._id}`} className='text-blue-500'>
                     `@{notification.actionUserId?.username || 'Unknown user'}`
                   </Link>
-                  {notification.type === 'like' ? ' liked your post' : notification.type === 'comment' ? ' commented on your post': " started following you"}
+                  {notification.type === 'post' ? `User ${notification.actionUserId.username} posted new content`: notification.type === 'like' ? ' liked your post' : notification.type === 'comment' ? ' commented on your post': " started following you"}
                 </Table.Cell>
               </Table.Row>
             ))}
